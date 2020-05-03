@@ -29,9 +29,8 @@ TimeoutLock.prototype.setState = function(on, callback) {
         // create timer
         this.timer = setTimeout(function() {
             this.service.getCharacteristic(Characteristic.On).setValue(false, undefined);
-        }.bind(this), this.config.timeout);
+        }.bind(this), this.config.timeout * 1000);
     } else {
-        clearTimeout(this.timer * 1000);
-        this.service.getCharacteristic(Characteristic.On).setValue(false, undefined);
+        clearTimeout(this.timer);
     }
 }
