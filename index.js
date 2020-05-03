@@ -26,11 +26,16 @@ TimeoutLock.prototype.getServices = function() {
     let switchService = new Service.Switch(this.config.name);
     switchService
       .getCharacteristic(Characteristic.On)
+      .on('get', this.getState.bind(this))
       .on('set', this.setState.bind(this));
 
     this.informationService = informationService;
     this.switchService = switchService;
     return [informationService, switchService];
+}
+
+TimeoutLock.prototype.getState = function() {
+    return this.locked
 }
 
 TimeoutLock.prototype.setState = function(on) {
@@ -43,7 +48,7 @@ TimeoutLock.prototype.setState = function(on) {
         this.timer = setTimeout(function() {
             this.locked = false;
             this.log('Deactivated ' + this.config.name)
-            this.service.getCharacteristic(Characteristic.On).updateValue(false);
+            this.switchService.getCharacteristic(Characteristic.On).updateValue(false);
         }.bind(this), this.config.timeout * 1000);
     } else {
         this.locked = false;
