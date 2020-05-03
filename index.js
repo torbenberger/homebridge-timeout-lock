@@ -39,6 +39,7 @@ TimeoutLock.prototype.getState = function(callback) {
 }
 
 TimeoutLock.prototype.setState = function(value, callback) {
+    clearTimeout(this.timer);
     this.locked = value;
 
     if(value) {
@@ -48,10 +49,8 @@ TimeoutLock.prototype.setState = function(value, callback) {
         // create timer
         this.timer = setTimeout(function() {
             this.log('Deactivated ' + this.config.name)
-            this.switchService.getCharacteristic(Characteristic.On).setValue(false);
+            this.switchService.getCharacteristic(Characteristic.On).updateValue(false);
         }.bind(this), this.config.timeout * 1000);
-    } else {
-        clearTimeout(this.timer);
     }
     
     callback()
