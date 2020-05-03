@@ -23,16 +23,15 @@ TimeoutLock.prototype.getServices = function() {
 
 TimeoutLock.prototype.setState = function(on, callback) {
     if(on) {
-        this.log('Activated ' + this.config.name + ' for ' + this.config.timeout * 1000) + ' seconds';
+        this.log('Activated ' + this.config.name + ' for ' + this.config.timeout + ' seconds');
         clearTimeout(this.timer);
-        this.service.getCharacteristic(Characteristic.On).setValue(true, undefined);
         
         // create timer
         this.timer = setTimeout(function() {
             this.service.getCharacteristic(Characteristic.On).setValue(false, undefined);
         }.bind(this), this.config.timeout);
     } else {
-        clearTimeout(this.timer);
+        clearTimeout(this.timer * 1000);
         this.service.getCharacteristic(Characteristic.On).setValue(false, undefined);
     }
 }
