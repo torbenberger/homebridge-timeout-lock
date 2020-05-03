@@ -26,7 +26,6 @@ TimeoutLock.prototype.getServices = function() {
     let switchService = new Service.Switch(this.config.name);
     switchService
       .getCharacteristic(Characteristic.On)
-      .on('get', this.getState.bind(this))
       .on('set', this.setState.bind(this));
 
     this.informationService = informationService;
