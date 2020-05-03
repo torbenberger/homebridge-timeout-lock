@@ -34,10 +34,6 @@ TimeoutLock.prototype.getServices = function() {
     return [informationService, switchService];
 }
 
-TimeoutLock.prototype.getState = function() {
-    return this.locked
-}
-
 TimeoutLock.prototype.setState = function(on) {
     if(on) {
         this.log('Activated ' + this.config.name + ' for ' + this.config.timeout + ' seconds');
@@ -48,7 +44,7 @@ TimeoutLock.prototype.setState = function(on) {
         this.timer = setTimeout(function() {
             this.locked = false;
             this.log('Deactivated ' + this.config.name)
-            this.service.getCharacteristic(Characteristic.On).setValue(false, undefined);
+            this.service.getCharacteristic(Characteristic.On).updateValue(false);
         }.bind(this), this.config.timeout * 1000);
     } else {
         this.locked = false;
