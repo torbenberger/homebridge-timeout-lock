@@ -12,15 +12,26 @@ module.exports = function(homebridge) {
 var TimeoutLock = function(log, config) {
     this.config = config;
     this.log = log;
-    this.service = new Service.Switch(this.config.name);
-    this.service.getCharacteristic(Characteristic.On).on('set', this.setState.bind(this));
-    this.service.getCharacteristic(Characteristic.On).on('get', this.getState.bind(this));
     this.timer = null;
     this.locked = false;
 }
 
 TimeoutLock.prototype.getServices = function() {
-    return [this.service];
+    let informationService = new Service.AccessoryInformation();
+    informationService
+      .setCharacteristic(Characteristic.Manufacturer, "Torben Berger")
+      .setCharacteristic(Characteristic.Model, "Timeout Lock")
+      .setCharacteristic(Characteristic.SerialNumber, "0000000001");
+
+    let switchService = new Service.Switch(this.config.name);
+    switchService
+      .getCharacteristic(Characteristic.On)
+      .on('get', this.getState.bind(this))
+      .on('set', this.setState.bind(this));
+
+    this.informationService = informationService;
+    this.switchService = switchService;
+    return [informationService, switchService];
 }
 
 TimeoutLock.prototype.getState = function() {
