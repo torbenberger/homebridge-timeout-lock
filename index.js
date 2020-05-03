@@ -26,6 +26,7 @@ TimeoutLock.prototype.getServices = function() {
     let switchService = new Service.Switch(this.config.name);
     switchService
       .getCharacteristic(Characteristic.On)
+      .on('get', this.getState.bind(this))
       .on('set', this.setState.bind(this));
 
     this.informationService = informationService;
@@ -33,20 +34,25 @@ TimeoutLock.prototype.getServices = function() {
     return [informationService, switchService];
 }
 
-TimeoutLock.prototype.setState = function(on) {
-    if(on) {
+TimeoutLock.prototype.getState = function(callback) {
+    callback(undefined, this.locked)
+}
+
+TimeoutLock.prototype.setState = function(value, callback) {
+    this.locked = value;
+
+    if(value) {
         this.log('Activated ' + this.config.name + ' for ' + this.config.timeout + ' seconds');
-        this.locked = true;
         clearTimeout(this.timer);
-        
+
         // create timer
         this.timer = setTimeout(function() {
-            this.locked = false;
             this.log('Deactivated ' + this.config.name)
-            this.switchService.getCharacteristic(Characteristic.On).updateValue(false);
+            this.switchService.getCharacteristic(Characteristic.On).setValue(false);
         }.bind(this), this.config.timeout * 1000);
     } else {
-        this.locked = false;
         clearTimeout(this.timer);
     }
+    
+    callback()
 }
